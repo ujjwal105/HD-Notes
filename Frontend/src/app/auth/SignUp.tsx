@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
@@ -5,6 +6,7 @@ import { Link } from "react-router-dom";
 import PublicLayout from "@/layouts/PublicLayout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
@@ -24,18 +26,32 @@ import { cn } from "@/lib/utils";
 import { signupSchema, type SignUpFormValues } from "@/lib/schema";
 
 function SignUp() {
+  const [otpSent, setOtpSent] = useState(false);
+
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: "",
       dob: undefined,
       email: "",
+      otp: "",
     },
   });
 
   const onSubmit = (data: SignUpFormValues) => {
     console.log(data);
   };
+
+  const handleOtpClick = async () => {
+    const isValid = await form.trigger(["name", "dob", "email"]);
+    if (isValid) {
+      setOtpSent(true);
+      toast("OTP Sent Successfully");
+    }
+  };
+
+  const { name, dob, email } = form.watch();
+  const isOtpDisabled = !name || !dob || !email;
 
   return (
     <PublicLayout>
@@ -128,15 +144,47 @@ function SignUp() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF] cursor-pointer"
-            >
-              Sign up
-            </Button>
+
+            {otpSent && (
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enter OTP</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter OTP"
+                        {...field}
+                        className="p-4 h-11"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {otpSent ? (
+              <Button
+                type="submit"
+                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF] cursor-pointer"
+              >
+                Sign Up
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleOtpClick}
+                disabled={isOtpDisabled}
+                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF] cursor-pointer"
+              >
+                Get OTP
+              </Button>
+            )}
           </form>
         </Form>
-        <div className="text-center text-[#969696] text-base  font-light">
+        <div className="text-center text-[#969696] text-base font-light">
           Already have an account??
           <Link
             to="/signin"

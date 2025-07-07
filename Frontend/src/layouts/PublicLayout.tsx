@@ -1,3 +1,4 @@
+import { Toaster } from "sonner";
 import AuthBanner from "/AuthBanner.png";
 import Logo from "/logo.png";
 
@@ -11,6 +12,7 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
         <div className="flex-1 flex flex-col justify-center items-center w-full -mt-24">
           <div className="w-full max-w-sm">{children}</div>
+          <Toaster />
         </div>
       </div>
       <div className="hidden lg:block w-7/3 h-full mx-2 py-2">

@@ -11,6 +11,7 @@ export const signupSchema = z.object({
     required_error: "Date of Birth is required",
   }),
   email: z.string().email("Invalid email address"),
+  otp: z.string().optional(),
 });
 
 export const signInSchema = z.object({
