@@ -41,7 +41,7 @@ function SignUp() {
     <PublicLayout>
       <div className="flex flex-col gap-6 w-full">
         <div>
-          <h1 className="text-4xl font-bold mb-1 text-[#232323] text-center lg:text-start">
+          <h1 className="text-4xl font-bold mb-2 text-[#232323] text-center lg:text-start">
             Sign up
           </h1>
           <p className="text-[#969696] text-base font-light text-center lg:text-start">
@@ -136,10 +136,10 @@ function SignUp() {
             </Button>
           </form>
         </Form>
-        <div className="text-center text-[#6C6C6C] text-base font-light">
+        <div className="text-center text-[#969696] text-base  font-light">
           Already have an account??
           <Link
-            to="/"
+            to="/signin"
             className="text-[#367AFF] underline font-medium cursor-pointer pl-1"
           >
             Sign in
