@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PublicLayout from "@/layouts/PublicLayout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,9 +24,13 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { signupSchema, type SignUpFormValues } from "@/lib/schema";
+import { apiClient } from "@/lib/api";
 
 function SignUp() {
   const [otpSent, setOtpSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
@@ -38,20 +42,90 @@ function SignUp() {
     },
   });
 
-  const onSubmit = (data: SignUpFormValues) => {
-    console.log(data);
+  const onSubmit = async (data: SignUpFormValues) => {
+    if (!otpSent || !data.otp) return;
+
+    setIsLoading(true);
+    try {
+      const response = await apiClient.verifySignup({
+        name: data.name,
+        email: data.email,
+        dateOfBirth: data.dob!.toISOString(),
+        otp: data.otp,
+      });
+
+      if (response.success) {
+        toast.success("Account created successfully!");
+        navigate("/notes");
+      } else {
+        toast.error(response.message || "Verification failed");
+        form.setValue("otp", "");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Verification failed");
+      form.setValue("otp", "");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleOtpClick = async () => {
+  const handleGetOTP = async () => {
     const isValid = await form.trigger(["name", "dob", "email"]);
-    if (isValid) {
-      setOtpSent(true);
-      toast("OTP Sent Successfully");
+    if (!isValid) return;
+
+    setIsLoading(true);
+    try {
+      const formData = form.getValues();
+      const response = await apiClient.signup({
+        name: formData.name,
+        email: formData.email,
+        dateOfBirth: formData.dob!.toISOString(),
+      });
+
+      if (response.success) {
+        setOtpSent(true);
+        toast.success("OTP sent to your email!");
+        setTimeout(() => {
+          const otpInput = document.querySelector(
+            'input[name="otp"]'
+          ) as HTMLInputElement;
+          if (otpInput) otpInput.focus();
+        }, 100);
+      } else {
+        toast.error(response.message || "Failed to send OTP");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    const formData = form.getValues();
+    setIsLoading(true);
+    try {
+      const response = await apiClient.signup({
+        name: formData.name,
+        email: formData.email,
+        dateOfBirth: formData.dob!.toISOString(),
+      });
+
+      if (response.success) {
+        toast.success("OTP resent to your email!");
+        form.setValue("otp", "");
+      } else {
+        toast.error(response.message || "Failed to resend OTP");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const { name, dob, email } = form.watch();
-  const isOtpDisabled = !name || !dob || !email;
+  const isGetOTPDisabled = !name || !dob || !email;
 
   return (
     <PublicLayout>
@@ -80,6 +154,7 @@ function SignUp() {
                       placeholder="Your Name"
                       {...field}
                       className="p-4 h-11"
+                      disabled={isLoading || otpSent}
                     />
                   </FormControl>
                   <FormMessage />
@@ -101,6 +176,7 @@ function SignUp() {
                             "w-full p-4 h-11 text-left font-normal justify-start",
                             !field.value && "text-muted-foreground"
                           )}
+                          disabled={isLoading || otpSent}
                         >
                           <Calendar className="mr-2 h-4 w-4" />
                           {field.value ? (
@@ -138,6 +214,7 @@ function SignUp() {
                       placeholder="Email"
                       {...field}
                       className="p-4 h-11"
+                      disabled={isLoading || otpSent}
                     />
                   </FormControl>
                   <FormMessage />
@@ -146,49 +223,63 @@ function SignUp() {
             />
 
             {otpSent && (
-              <FormField
-                control={form.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Enter OTP</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter OTP"
-                        {...field}
-                        className="p-4 h-11"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="otp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enter OTP</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter 6-digit OTP"
+                          {...field}
+                          className="p-4 h-11"
+                          disabled={isLoading}
+                          maxLength={6}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="text-sm">
+                  <button
+                    type="button"
+                    onClick={handleResendOTP}
+                    disabled={isLoading}
+                    className="text-[#367AFF] underline font-medium hover:no-underline"
+                  >
+                    Resend OTP
+                  </button>
+                </div>
+              </>
             )}
-
             {otpSent ? (
               <Button
                 type="submit"
-                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF] cursor-pointer"
+                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF]"
+                disabled={isLoading || !form.watch("otp")}
               >
-                Sign Up
+                {isLoading ? "Verifying..." : "Sign Up"}
               </Button>
             ) : (
               <Button
                 type="button"
-                onClick={handleOtpClick}
-                disabled={isOtpDisabled}
-                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF] cursor-pointer"
+                onClick={handleGetOTP}
+                disabled={isGetOTPDisabled || isLoading}
+                className="mt-2 w-full text-base font-semibold h-12 bg-[#367AFF] hover:bg-[#367AFF]"
               >
-                Get OTP
+                {isLoading ? "Sending..." : "Get OTP"}
               </Button>
             )}
           </form>
         </Form>
         <div className="text-center text-[#969696] text-base font-light">
-          Already have an account??
+          Already have an account?{" "}
           <Link
-            to="/signin"
-            className="text-[#367AFF] underline font-medium cursor-pointer pl-1"
+            to="/auth"
+            className="text-[#367AFF] underline font-medium cursor-pointer"
           >
             Sign in
           </Link>
