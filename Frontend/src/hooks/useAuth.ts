@@ -48,8 +48,8 @@ export const useAuth = () => {
   };
 
   const login = (
-    userData: User,
-    tokens: { accessToken: string; refreshToken: string }
+    userData: User
+    // tokens: { accessToken: string; refreshToken: string }
   ) => {
     setUser(userData);
     setIsAuthenticated(true);
