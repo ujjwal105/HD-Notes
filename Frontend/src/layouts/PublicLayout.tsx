@@ -13,11 +13,11 @@ function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>
-      <div className="hidden lg:block w-7/3 h-full mx-2 py-2">
+      <div className="hidden lg:block w-7/3">
         <img
           src={AuthBanner}
           alt="AuthBanner"
-          className="object-cover w-full h-full rounded-2xl"
+          className="object-fill h-full w-full"
         />
       </div>
     </div>
