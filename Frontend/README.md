@@ -1,69 +1,128 @@
-# React + TypeScript + Vite
+# HD Notes Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🌐 Live Application
 
-Currently, two official plugins are available:
+**Host URL:** https://highdelite-notes-app.netlify.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Getting Started
 
-## Expanding the ESLint configuration
+### Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js (version 16 or higher)
+- npm or yarn package manager
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository** (if not already done)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```bash
+   git clone <repository-url>
+   cd HD-Notes/Frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+### Running Locally
+
+1. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **Open your browser**
+   - Navigate to `http://localhost:5173`
+   - The application will automatically reload when you make changes
+
+### Development Features
+
+- **Hot Module Replacement (HMR)**: Changes reflect immediately in the browser
+- **TypeScript Support**: Full TypeScript integration with type checking
+- **ESLint**: Code linting for better code quality
+- **Vite**: Fast build tool for development and production
+
+## 🏗️ Building for Production
+
+### Build Command
+
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+This command will:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Compile and bundle all TypeScript/React code
+- Optimize assets for production
+- Generate static files in the `dist` folder
+- Create minified and optimized builds
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Preview Production Build
+
+After building, you can preview the production build locally:
+
+```bash
+npm run preview
 ```
+
+### Build Output
+
+The build process creates a `dist` folder containing:
+
+- Optimized HTML, CSS, and JavaScript files
+- Static assets (images, fonts, etc.)
+- Ready-to-deploy files for hosting platforms
+
+## 📁 Project Structure
+
+```
+Frontend/
+├── src/
+│   ├── app/           # Main application components
+│   │   ├── auth/      # Authentication components
+│   │   └── Notes.tsx  # Notes application
+│   ├── components/    # Reusable UI components
+│   ├── hooks/         # Custom React hooks
+│   ├── layouts/       # Layout components
+│   ├── lib/           # Utilities and services
+│   └── routes/        # Routing components
+├── public/            # Static assets
+└── package.json       # Dependencies and scripts
+```
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint for code quality
+
+## 🌍 Environment Variables
+
+Create a `.env` file in the root directory for environment-specific configurations:
+
+```env
+VITE_API_URL= //You backend api string
+```
+
+## 🚀 Deployment
+
+The application is configured for deployment on Netlify. The build process creates optimized static files that can be deployed to any static hosting service.
+
+### Netlify Deployment
+
+- Connect your repository to Netlify
+- Build command: `npm run build`
+- Publish directory: `dist`
+- The application will be automatically deployed on push to main branch
+
+## 📱 Features
+
+- **Authentication**: Sign up and sign in functionality
+- **Notes Management**: Create, read, update, and delete notes
+- **Responsive Design**: Works on desktop and mobile devices
+- **Modern UI**: Built with shadcn/ui components
+- **TypeScript**: Full type safety throughout the application
+
